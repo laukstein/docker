@@ -1,0 +1,18 @@
+version: "3.7"
+services:
+  apache:
+    container_name: apache
+    build: ./.docker/apache/
+    ports:
+      - 80:80
+    volumes:
+      - ./.docker/apache/apache-config.conf:/usr/local/apache2/conf/apache-config.conf:rw
+      - ./www:/var/www/html:rw,delegated
+    depends_on:
+      - php
+  php:
+    container_name: php
+    build: ./.docker/php/
+    volumes:
+      - ./.docker/php/php.ini:/usr/local/etc/php/php.ini:rw
+      - ./www:/var/www/html:rw,delegated
