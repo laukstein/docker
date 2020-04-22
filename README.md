@@ -6,4 +6,9 @@ In order to keep docker image small and perform with best performance, using `ht
 
 Run image by starting [Docker](https://www.docker.com/products/docker-desktop) and running `docker-compose up --force-recreate`
 
-If running on Windows and experiencing firewall issue sharing files, fallow details in <https://success.docker.com/article/error-a-firewall-is-blocking-file-sharing-between-windows-and-the-containers> and <https://stackoverflow.com/questions/42203488/settings-to-windows-firewall-to-allow-docker-for-windows-to-share-drive>
+## Experiencing sharing files issue on Windows
+
+If running on Windows and experiencing firewall issue sharing files, fallow details in
+
+* <https://success.docker.com/article/error-a-firewall-is-blocking-file-sharing-between-windows-and-the-containers>
+* <https://stackoverflow.com/questions/42203488/settings-to-windows-firewall-to-allow-docker-for-windows-to-share-drive>

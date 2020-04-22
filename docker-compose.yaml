@@ -2,20 +2,65 @@ version: "3.7"
 services:
   apache:
     container_name: apache
-    build: ./.docker/apache/
+    image: httpd:alpine
     ports:
       - 80:80
     volumes:
-      - ./.docker/apache/apache-config.conf:/usr/local/apache2/conf/apache-config.conf:rw
-      - ./www:/var/www/html:rw,delegated
+      # Add apache configuration
+      - type: bind
+        source: ./.docker/apache/httpd-vhosts.conf
+        target: /usr/local/apache2/conf/extra/httpd-vhosts.conf
+        read_only: true
+      # Add web files
+      - type: bind
+        source: ./www
+        target: /var/www/html
+        read_only: true
+    # Run apache, add configuration, disable all apache modules and enable the only ones that are necessary
+    # https://github.com/docker-library/httpd/blob/master/2.4/alpine/Dockerfile#L159
+    # WORKDIR /usr/local/apache2
+    command: >
+      sh -c "sed -ri 's/^\s*LoadModule/#LoadModule/g' conf/httpd.conf &&
+             sed -ri '/LoadModule (authz_core_module|deflate_module|dir_module|env_module|expires_module|filter_module|headers_module|log_config_module|logio_module|mime_module|mpm_worker_module|proxy_fcgi_module|proxy_module|remoteip_module|rewrite_module|setenvif_module|ssl_module|unixd_module)\s/s/^\s*#\s*//g' /usr/local/apache2/conf/httpd.conf &&
+             {
+              echo 'ServerName localhost'
+              echo 'Include conf/extra/httpd-vhosts.conf'
+             } >> conf/httpd.conf &&
+             exec httpd-foreground"
     depends_on:
       - php
   php:
     container_name: php
-    build: ./.docker/php/
-    expose:
-      - 9000
+    image: php:fpm-alpine
     volumes:
-      - ./.docker/php/php.ini:/usr/local/etc/php/php.ini:rw
-      - ./.docker/php/www.conf:/usr/local/etc/php-fpm.d/www.conf
-      - ./www:/var/www/html:rw,delegated
+      # Add php configuration
+      # Install ca root certificates https://curl.haxx.se/ca/cacert.pem
+      - type: bind
+        source: ./.docker/php/ca-certificates.crt
+        target: /etc/ssl/certs/ca-certificates.crt
+        read_only: true
+      - type: bind
+        source: ./.docker/php/php.ini
+        target: /usr/local/etc/php/php.ini
+        read_only: true
+      - type: bind
+        source: ./.docker/php/www.conf
+        target: /usr/local/etc/php-fpm.d/www.conf
+        read_only: true
+      # Add web files
+      - type: bind
+        source: ./www
+        target: /var/www/html
+        read_only: true
+    environment:
+      # Fix debconf warnings upon build
+      DEBIAN_FRONTEND: noninteractive
+      # Workaround missing openssl issue https://github.com/docker-library/php/issues/924
+      PHP_OPENSSL: "yes"
+    # Run php, disable unused php extensions and install mysqli extension
+    # https://github.com/docker-library/php/blob/master/7.4/alpine3.11/fpm/Dockerfile#L241
+    # WORKDIR /var/www/html
+    command: >
+      sh -c "sed -ri 's/^\s*extension=/;extension=/g' /usr/local/etc/php/conf.d/docker-php-ext-sodium.ini &&
+             exec php-fpm &&
+             docker-php-ext-install mysqli"
