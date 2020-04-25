@@ -8,12 +8,12 @@ services:
     volumes:
       # Add apache configuration
       - type: bind
-        source: ./.docker/apache/httpd-vhosts.conf
+        source: ${VOLUME_PATH}/.docker/apache/httpd-vhosts.conf
         target: /usr/local/apache2/conf/extra/httpd-vhosts.conf
         read_only: true
       # Add web files
       - type: bind
-        source: ./www
+        source: ${VOLUME_PATH}/www
         target: /var/www/html
         read_only: true
     # Run apache, add configuration, disable all apache modules and enable the only ones that are necessary
@@ -36,20 +36,20 @@ services:
       # Add php configuration
       # Install ca root certificates https://curl.haxx.se/ca/cacert.pem
       - type: bind
-        source: ./.docker/php/ca-certificates.crt
+        source: ${VOLUME_PATH}/.docker/php/ca-certificates.crt
         target: /etc/ssl/certs/ca-certificates.crt
         read_only: true
       - type: bind
-        source: ./.docker/php/php.ini
+        source: ${VOLUME_PATH}/.docker/php/php.ini
         target: /usr/local/etc/php/php.ini
         read_only: true
       - type: bind
-        source: ./.docker/php/www.conf
+        source: ${VOLUME_PATH}/.docker/php/www.conf
         target: /usr/local/etc/php-fpm.d/www.conf
         read_only: true
       # Add web files
       - type: bind
-        source: ./www
+        source: ${VOLUME_PATH}/www
         target: /var/www/html
         read_only: true
     environment:
