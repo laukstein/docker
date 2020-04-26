@@ -22,7 +22,7 @@ jobs:
         run: |
           TAG=$(echo -n $GITHUB_SHA | head -c7)
           echo ${{ secrets.PACKAGES_TOKEN }} | docker login docker.pkg.github.com -u $GITHUB_ACTOR --password-stdin
-          docker build --t docker.pkg.github.com/$GITHUB_REPOSITORY/${{ secrets.IMAGE_NAME }}:${TAG} .
+          docker build --tag docker.pkg.github.com/$GITHUB_REPOSITORY/${{ secrets.IMAGE_NAME }}:${TAG} .
           docker push docker.pkg.github.com/$GITHUB_REPOSITORY/${{ secrets.IMAGE_NAME }}:${TAG}
 
       - name: Save DigitalOcean kubeconfig
