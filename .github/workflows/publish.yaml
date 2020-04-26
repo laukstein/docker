@@ -12,14 +12,14 @@ jobs:
     steps:
       - uses: actions/checkout@master
 
+      - name: Update SHA
+        run: echo $GITHUB_SHA > $GITHUB_WORKSPACE/site/_meta
+
       - name: Test image
         run: docker-compose up -d --build
 
       - name: List containers
         run: docker ps -s -a
-
-      - name: Update SHA
-        run: echo $GITHUB_SHA > $GITHUB_WORKSPACE/site/_meta
 
       - name: Build, push, and verify image in dockerhub
         run: |
