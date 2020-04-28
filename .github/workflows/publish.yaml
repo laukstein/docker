@@ -31,6 +31,7 @@ jobs:
 
       - name: Deploy to kubernetes
         run: |
+          KUBECONFIG=$HOME/.kube/config
           TAG=$(echo $GITHUB_SHA | head -c7)
           sed -i 's|<IMAGE>|${GITHUB_REPOSITORY}:${TAG}|g' $GITHUB_WORKSPACE/.kube/deployment.yaml
           sed -i 's|<NAME>|/${{ secrets.DIGITALOCEAN_CLUSTER }}|g' $GITHUB_WORKSPACE/.kube/deployment.yaml
