@@ -33,10 +33,6 @@ jobs:
       - name: Deploy Docker swarm to DigitalOcean Kubernetes
         run: |
           docker stack deploy --namespace ${{ secrets.DIGITALOCEAN_CLUSTER }} --orchestrator=kubernetes -c $GITHUB_WORKSPACE/docker-compose.yaml ${{ secrets.DIGITALOCEAN_CLUSTER }}
-          kubectl create namespace ${{ secrets.DIGITALOCEAN_CLUSTER }} --kubeconfig=$GITHUB_WORKSPACE/.kube/.kubeconfig
-          kubectl apply --namespace=${{ secrets.DIGITALOCEAN_CLUSTER }} -f $GITHUB_WORKSPACE/.kube/deployment.yaml --kubeconfig=$GITHUB_WORKSPACE/.kube/.kubeconfig
+      #     kubectl create namespace ${{ secrets.DIGITALOCEAN_CLUSTER }} --kubeconfig=$GITHUB_WORKSPACE/.kube/.kubeconfig
+      #     kubectl apply --namespace=${{ secrets.DIGITALOCEAN_CLUSTER }} -f $GITHUB_WORKSPACE/.kube/deployment.yaml --kubeconfig=$GITHUB_WORKSPACE/.kube/.kubeconfig
 
-      - name: Verify deployment
-        run: |
-          kubectl get namespace --kubeconfig=$GITHUB_WORKSPACE/.kube/.kubeconfig
-          kubectl rollout status deployment/${{ secrets.DIGITALOCEAN_CLUSTER }} --kubeconfig=$GITHUB_WORKSPACE/.kube/.kubeconfig
