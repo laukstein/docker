@@ -28,7 +28,7 @@ jobs:
       - name: Deploy Docker Swarm to DigitalOcean Kubernetes
         run: |
             docker stack deploy \
-            --compose-file /path/to/docker-compose.yml \
+            --compose-file $GITHUB_WORKSPACE/docker-compose.yaml \
             --namespace ${{ secrets.IMAGE_NAME }} \
             --kubeconfig=$GITHUB_WORKSPACE/.kubeconfig \
             --orchestrator kubernetes \
