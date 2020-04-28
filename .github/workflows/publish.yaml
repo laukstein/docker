@@ -30,13 +30,8 @@ jobs:
           docker stack deploy --compose-file $GITHUB_WORKSPACE/docker-compose.yaml ${{ secrets.DIGITALOCEAN_CLUSTER }}
 
       - name: Deploy to kubernetes
-        env:
-          DEPLOYMENT: $GITHUB_WORKSPACE/.kube/deployment.yaml
-          TAG: $(echo $GITHUB_SHA | head -c7)
         run: |
-          echo ${DEPLOYMENT}
-          echo ${TAG}
-          ls -la $GITHUB_WORKSPACE/.kube
+          TAG=$(echo $GITHUB_SHA | head -c7)
           sed -i 's|<IMAGE>|${GITHUB_REPOSITORY}:${TAG}|g' $GITHUB_WORKSPACE/.kube/deployment.yaml
           sed -i 's|<NAME>|/${{ secrets.DIGITALOCEAN_CLUSTER }}|g' $GITHUB_WORKSPACE/.kube/deployment.yaml
           kubectl create namespace ${{ secrets.DIGITALOCEAN_CLUSTER }}
