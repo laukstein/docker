@@ -25,9 +25,10 @@ jobs:
           args: kubernetes cluster kubeconfig show ${{ secrets.DIGITALOCEAN_CLUSTER }} > $GITHUB_WORKSPACE/.kubeconfig
 
       - name: Deploy Docker swarm
+        env:
+          DOCKER_ORCHESTRATOR: kubernetes
         run: |
-          docker swarm init
-          docker stack deploy --compose-file $GITHUB_WORKSPACE/docker-compose.yaml ${{ secrets.DIGITALOCEAN_CLUSTER }}
+          docker stack deploy -c $GITHUB_WORKSPACE/docker-compose.yaml ${{ secrets.DIGITALOCEAN_CLUSTER }}
 
       - name: Update deployment file
         run: |
