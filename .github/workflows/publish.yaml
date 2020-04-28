@@ -31,8 +31,7 @@ jobs:
             --compose-file $GITHUB_WORKSPACE/docker-compose.yaml \
             --namespace ${{ secrets.IMAGE_NAME }} \
             --kubeconfig $GITHUB_WORKSPACE/.kube/.kubeconfig \
-            --orchestrator kubernetes \
-            mystack
+            --orchestrator kubernetes
 
       - name: Update deployment file
         run: |
