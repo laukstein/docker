@@ -35,10 +35,13 @@ jobs:
           sed -i 's|<IMAGE>|${GITHUB_REPOSITORY}:${TAG}|g' $GITHUB_WORKSPACE/.kube/deployment.yaml
           sed -i 's|<NAME>|/${{ secrets.DIGITALOCEAN_CLUSTER }}|g' $GITHUB_WORKSPACE/.kube/deployment.yaml
 
+      - name: Create kubernetes namespace
+        run:
+          kubectl create ns ${{ secrets.DIGITALOCEAN_CLUSTER }} --kubeconfig=$GITHUB_WORKSPACE/.kubeconfig
+
       - name: Deploy to kubernetes
         run:
-          kubectl create namespace ${{ secrets.DIGITALOCEAN_CLUSTER }} --kubeconfig=$GITHUB_WORKSPACE/.kubeconfig
-          kubectl apply -f $GITHUB_WORKSPACE/.kube/deployment.yaml --kubeconfig=$GITHUB_WORKSPACE/.kubeconfig
+          kubectl apply -n ${{ secrets.DIGITALOCEAN_CLUSTER }} -f $GITHUB_WORKSPACE/.kube/deployment.yaml --kubeconfig=$GITHUB_WORKSPACE/.kubeconfig
 
       - name: Verify deployment
         run: |
