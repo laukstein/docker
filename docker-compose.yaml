@@ -3,6 +3,11 @@ services:
   apache:
     container_name: apache
     image: httpd:alpine
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+        max_attempts: 3
     ports:
       - 80:80
     volumes:
@@ -32,6 +37,11 @@ services:
   php:
     container_name: php
     image: php:fpm-alpine
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+        max_attempts: 3
     volumes:
       # Add php configuration
       # Install ca root certificates https://curl.haxx.se/ca/cacert.pem
