@@ -24,18 +24,9 @@ jobs:
         with:
           args: kubernetes cluster kubeconfig show ${{ secrets.DIGITALOCEAN_CLUSTER }} > $GITHUB_WORKSPACE/.kubeconfig
 
-      - name: Docker swarm join
-        env:
-          DOCKER_STACK_ORCHESTRATOR: kubernetes
-          KUBECONFIG: $GITHUB_WORKSPACE/.kubeconfig
+      - name: Deploy Docker swarm
         run: |
           docker swarm join
-
-      - name: Deploy Docker swarm
-        env:
-          DOCKER_STACK_ORCHESTRATOR: kubernetes
-          KUBECONFIG: $GITHUB_WORKSPACE/.kubeconfig
-        run: |
           docker stack deploy -c $GITHUB_WORKSPACE/docker-compose.yaml ${{ secrets.DIGITALOCEAN_CLUSTER }}
 
       - name: Update deployment file
