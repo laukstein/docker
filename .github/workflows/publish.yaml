@@ -23,14 +23,14 @@ jobs:
         env:
           DIGITALOCEAN_ACCESS_TOKEN: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
         with:
-          args: kubernetes cluster kubeconfig show ${{ secrets.DIGITALOCEAN_CLUSTER }} > $GITHUB_WORKSPACE/.kubeconfig
+          args: kubernetes cluster kubeconfig show ${{ secrets.DIGITALOCEAN_CLUSTER }} > $GITHUB_WORKSPACE/.kube/.kubeconfig
 
       - name: Deploy Docker Swarm to DigitalOcean Kubernetes
         run: |
             docker stack deploy \
             --compose-file $GITHUB_WORKSPACE/docker-compose.yaml \
             --namespace ${{ secrets.IMAGE_NAME }} \
-            --kubeconfig=$GITHUB_WORKSPACE/.kubeconfig \
+            --kubeconfig=$GITHUB_WORKSPACE/.kube/.kubeconfig \
             --orchestrator kubernetes \
             mystack
 
@@ -41,7 +41,7 @@ jobs:
           sed -i 's/<NAME>|/${{ secrets.IMAGE_NAME }}/g' $GITHUB_WORKSPACE/.kube/deployment.yaml
 
       - name: Deploy to DigitalOcean Kubernetes
-        run: kubectl --kubeconfig=$GITHUB_WORKSPACE/.kubeconfig apply -f $GITHUB_WORKSPACE/.kube/deployment.yaml
+        run: kubectl --kubeconfig=$GITHUB_WORKSPACE/.kube/.kubeconfig apply -f $GITHUB_WORKSPACE/.kube/deployment.yaml
 
       - name: Verify deployment
         run: kubectl --kubeconfig=$GITHUB_WORKSPACE/.kubeconfig rollout status deployment/www
