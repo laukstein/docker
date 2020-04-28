@@ -23,7 +23,7 @@ jobs:
         env:
           DIGITALOCEAN_ACCESS_TOKEN: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
         with:
-          args: doctl kubernetes cluster kubeconfig save ${{ secrets.DIGITALOCEAN_CLUSTER }}
+          args: kubernetes cluster kubeconfig save ${{ secrets.DIGITALOCEAN_CLUSTER }}
 
       - name: Deploy Docker Swarm to DigitalOcean Kubernetes
         run: |
