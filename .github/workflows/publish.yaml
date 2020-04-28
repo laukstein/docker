@@ -36,7 +36,7 @@ jobs:
         run: |
           TAG=$(echo $GITHUB_SHA | head -c7)
           sed -i 's/<IMAGE>/${GITHUB_REPOSITORY}:${TAG}/g' $GITHUB_WORKSPACE/.kube/deployment.yaml
-          sed -i 's/<NAME>|/${{ secrets.IMAGE_NAME }}/g' $GITHUB_WORKSPACE/.kube/deployment.yaml
+          sed -i 's/<NAME>|/${{ secrets.DIGITALOCEAN_CLUSTER }}/g' $GITHUB_WORKSPACE/.kube/deployment.yaml
 
       - name: Deploy to DigitalOcean Kubernetes
         run: kubectl apply -f $GITHUB_WORKSPACE/.kube/deployment.yaml
