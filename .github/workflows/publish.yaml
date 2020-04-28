@@ -26,7 +26,8 @@ jobs:
           args: kubernetes cluster kubeconfig show ${{ secrets.DIGITALOCEAN_CLUSTER }} > $GITHUB_WORKSPACE/.kubeconfig
 
       - name: Deploy Docker Swarm to DigitalOcean Kubernetes
-          docker stack deploy \
+        run: |
+            docker stack deploy \
             --compose-file /path/to/docker-compose.yml \
             --namespace ${{ secrets.IMAGE_NAME }} \
             --prune \
