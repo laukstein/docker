@@ -12,28 +12,36 @@ jobs:
     steps:
       - uses: actions/checkout@master
 
-      - name: Test docker images
-        run: |
-          docker-compose up -d --build
-          docker ps -s -a
+      # - name: Test docker images
+      #   run: |
+      #     docker-compose up -d --build
+      #     docker ps -s -a
+
+      - uses: allenevans/set-env@v1
+        with:
+          KUBECONFIG: $GITHUB_WORKSPACE/.kube/.kubeconfig
 
       - name: Save DigitalOcean kubeconfig
         uses: digitalocean/action-doctl@master
         env:
           DIGITALOCEAN_ACCESS_TOKEN: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
         with:
-          args: kubernetes cluster kubeconfig show ${{ secrets.DIGITALOCEAN_CLUSTER }} > $GITHUB_WORKSPACE/.kube/.kubeconfig
+          args: kubernetes cluster kubeconfig show ${{ secrets.DIGITALOCEAN_CLUSTER }} > ${KUBECONFIG}
 
-      - name: Update deployment file
-        run: |
-          TAG=$(echo $GITHUB_SHA | head -c7)
-          sed -i 's/<IMAGE>/${GITHUB_REPOSITORY}:${TAG}/g' $GITHUB_WORKSPACE/.kube/deployment.yaml
-          sed -i 's/<NAME>|/${{ secrets.DIGITALOCEAN_CLUSTER }}/g' $GITHUB_WORKSPACE/.kube/deployment.yaml
+      # - name: Update deployment file
+      #   run: |
+      #     TAG=$(echo $GITHUB_SHA | head -c7)
+      #     sed -i 's/<IMAGE>/${GITHUB_REPOSITORY}:${TAG}/g' $GITHUB_WORKSPACE/.kube/deployment.yaml
+      #     sed -i 's/<NAME>|/${{ secrets.DIGITALOCEAN_CLUSTER }}/g' $GITHUB_WORKSPACE/.kube/deployment.yaml
 
       - name: Deploy Docker swarm to DigitalOcean Kubernetes
         run: |
-          $GITHUB_WORKSPACE/.kube/.kubeconfig > /home/runner/.kube/config
           docker stack deploy --namespace ${{ secrets.DIGITALOCEAN_CLUSTER }} --orchestrator=kubernetes -c $GITHUB_WORKSPACE/docker-compose.yaml ${{ secrets.DIGITALOCEAN_CLUSTER }}
-      #     kubectl create namespace ${{ secrets.DIGITALOCEAN_CLUSTER }} --kubeconfig=$GITHUB_WORKSPACE/.kube/.kubeconfig
-      #     kubectl apply --namespace=${{ secrets.DIGITALOCEAN_CLUSTER }} -f $GITHUB_WORKSPACE/.kube/deployment.yaml --kubeconfig=$GITHUB_WORKSPACE/.kube/.kubeconfig
+      #     kubectl create namespace ${{ secrets.DIGITALOCEAN_CLUSTER }} --kubeconfig=${KUBECONFIG}
+      #     kubectl apply --namespace=${{ secrets.DIGITALOCEAN_CLUSTER }} -f $GITHUB_WORKSPACE/.kube/deployment.yaml --kubeconfig=${KUBECONFIG}
+
+      # - name: Verify deployment
+      #   run: |
+      #     kubectl get namespace --kubeconfig=${KUBECONFIG}
+      #     kubectl rollout status deployment/${{ secrets.DIGITALOCEAN_CLUSTER }} --kubeconfig=${KUBECONFIG}
 
