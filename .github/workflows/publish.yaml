@@ -26,7 +26,10 @@ jobs:
           args: kubernetes cluster kubeconfig save ${{ secrets.DIGITALOCEAN_CLUSTER }}
 
       - name: Deploy Docker Swarm to DigitalOcean Kubernetes
-        run: docker stack deploy --compose-file $GITHUB_WORKSPACE/docker-compose.yaml --namespace ${{ secrets.DIGITALOCEAN_CLUSTER }} --orchestrator kubernetes
+        run: docker stack deploy ${{ secrets.DIGITALOCEAN_CLUSTER }} \
+               --compose-file $GITHUB_WORKSPACE/docker-compose.yaml \
+               --namespace ${{ secrets.DIGITALOCEAN_CLUSTER }} \
+               --orchestrator kubernetes
 
       - name: Update deployment file
         run: |
