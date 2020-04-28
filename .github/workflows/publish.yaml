@@ -12,7 +12,7 @@ jobs:
     steps:
       - uses: actions/checkout@master
 
-      - name: Test image
+      - name: Test docker images
         run: docker-compose up -d --build
 
       - name: List containers
@@ -25,21 +25,20 @@ jobs:
         with:
           args: kubernetes cluster kubeconfig save ${{ secrets.DIGITALOCEAN_CLUSTER }}
 
-      - name: Deploy Docker Swarm to DigitalOcean Kubernetes
-        run: docker stack deploy \
-               --compose-file $GITHUB_WORKSPACE/docker-compose.yaml \
-               --namespace ${{ secrets.DIGITALOCEAN_CLUSTER }} \
-               --orchestrator kubernetes \
-               ${{ secrets.DIGITALOCEAN_CLUSTER }}
-
       - name: Update deployment file
         run: |
           TAG=$(echo $GITHUB_SHA | head -c7)
           sed -i 's/<IMAGE>/${GITHUB_REPOSITORY}:${TAG}/g' $GITHUB_WORKSPACE/.kube/deployment.yaml
           sed -i 's/<NAME>|/${{ secrets.DIGITALOCEAN_CLUSTER }}/g' $GITHUB_WORKSPACE/.kube/deployment.yaml
 
-      - name: Deploy to DigitalOcean Kubernetes
-        run: kubectl apply -f $GITHUB_WORKSPACE/.kube/deployment.yaml
+      - name: Deploy Docker swarm to DigitalOcean Kubernetes
+        run: |
+          docker stack deploy --namespace ${{ secrets.DIGITALOCEAN_CLUSTER }} --orchestrator=kubernetes -c $GITHUB_WORKSPACE/docker-compose.yaml ${{ secrets.DIGITALOCEAN_CLUSTER }}
+          kubectl create namespace ${{ secrets.DIGITALOCEAN_CLUSTER }}
+          kubectl apply --namespace=${{ secrets.DIGITALOCEAN_CLUSTER }} -f $GITHUB_WORKSPACE/.kube/deployment.yaml
+
+      - name: List kubernetes namespaces
+        run: kubectl get namespace
 
       - name: Verify deployment
-        run: kubectl rollout status deployment/www
+        run: kubectl rollout status deployment/${{ secrets.DIGITALOCEAN_CLUSTER }}
