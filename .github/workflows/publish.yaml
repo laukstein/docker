@@ -26,7 +26,7 @@ jobs:
 
       - name: Deploy Docker swarm
         run: |
-          docker swarm join
+          docker swarm init
           docker stack deploy -c $GITHUB_WORKSPACE/docker-compose.yaml ${{ secrets.DIGITALOCEAN_CLUSTER }}
 
       - name: Update deployment file
