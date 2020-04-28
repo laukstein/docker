@@ -37,7 +37,7 @@ jobs:
 
       - name: Create kubernetes namespace
         run:
-          kubectl create namespace ${{ secrets.DIGITALOCEAN_CLUSTER }} --kubeconfig=$GITHUB_WORKSPACE/.kubeconfig
+          kubectl describe namespace ${{ secrets.DIGITALOCEAN_CLUSTER }} --kubeconfig=$GITHUB_WORKSPACE/.kubeconfig || kubectl create namespace ${{ secrets.DIGITALOCEAN_CLUSTER }} --kubeconfig=$GITHUB_WORKSPACE/.kubeconfig
 
       - name: Deploy to kubernetes
         run:
