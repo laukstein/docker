@@ -17,11 +17,6 @@ jobs:
       #     docker-compose up -d --build
       #     docker ps -s -a
 
-      - uses: allenevans/set-env@master
-        with:
-          DEPLOYMENT: $GITHUB_WORKSPACE/.kube/deployment.yaml
-          TAG: $(echo $GITHUB_SHA | head -c7)
-
       - name: Save DigitalOcean kubeconfig
         uses: digitalocean/action-doctl@master
         env:
@@ -33,6 +28,9 @@ jobs:
         run: docker stack deploy --namespace ${{ secrets.DIGITALOCEAN_CLUSTER }} -c $GITHUB_WORKSPACE/docker-compose.yaml --orchestrator=kubernetes ${{ secrets.DIGITALOCEAN_CLUSTER }}
 
       - name: Deploy to kubernetes
+        env:
+          DEPLOYMENT: $GITHUB_WORKSPACE/.kube/deployment.yaml
+          TAG: $(echo $GITHUB_SHA | head -c7)
         run: |
           sed -i 's/<IMAGE>/${GITHUB_REPOSITORY}:${TAG}/g' ${DEPLOYMENT}
           sed -i 's/<NAME>|/${{ secrets.DIGITALOCEAN_CLUSTER }}/g' ${DEPLOYMENT}
