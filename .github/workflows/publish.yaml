@@ -27,18 +27,18 @@ jobs:
       - name: Deploy Docker swarm
         run: |
           docker swarm init
-          docker stack deploy --compose-file ~/docker-compose.yaml ${{ secrets.DIGITALOCEAN_CLUSTER }}
+          docker stack deploy --compose-file $GITHUB_WORKSPACE/docker-compose.yaml ${{ secrets.DIGITALOCEAN_CLUSTER }}
 
       - name: Update deployment file
         run: |
           TAG=$(echo $GITHUB_SHA | head -c7)
-          sed -i 's|<IMAGE>|${GITHUB_REPOSITORY}:${TAG}|g' ~/.kube/deployment.yaml
-          sed -i 's|<NAME>|/${{ secrets.DIGITALOCEAN_CLUSTER }}|g' ~/.kube/deployment.yaml
+          sed -i 's|<IMAGE>|${GITHUB_REPOSITORY}:${TAG}|g' $GITHUB_WORKSPACE/.kube/deployment.yaml
+          sed -i 's|<NAME>|/${{ secrets.DIGITALOCEAN_CLUSTER }}|g' $GITHUB_WORKSPACE/.kube/deployment.yaml
 
       - name: Deploy to kubernetes
         run:
           kubectl create namespace ${{ secrets.DIGITALOCEAN_CLUSTER }} --kubeconfig=~/.kubeconfig
-          kubectl apply --namespace=${{ secrets.DIGITALOCEAN_CLUSTER }} -f ~/.kube/deployment.yaml --kubeconfig=~/.kubeconfig
+          kubectl apply --namespace=${{ secrets.DIGITALOCEAN_CLUSTER }} -f $GITHUB_WORKSPACE/.kube/deployment.yaml --kubeconfig=~/.kubeconfig
 
       - name: Verify deployment
         run: |
