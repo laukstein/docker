@@ -31,16 +31,14 @@ jobs:
 
       - name: Deploy to kubernetes
         run: |
-          KUBECONFIG=~/.kubeconfig
           TAG=$(echo $GITHUB_SHA | head -c7)
           sed -i 's|<IMAGE>|${GITHUB_REPOSITORY}:${TAG}|g' $GITHUB_WORKSPACE/.kube/deployment.yaml
           sed -i 's|<NAME>|/${{ secrets.DIGITALOCEAN_CLUSTER }}|g' $GITHUB_WORKSPACE/.kube/deployment.yaml
-          kubectl create namespace ${{ secrets.DIGITALOCEAN_CLUSTER }}
-          kubectl apply --namespace=${{ secrets.DIGITALOCEAN_CLUSTER }} -f $GITHUB_WORKSPACE/.kube/deployment.yaml
+          kubectl create namespace ${{ secrets.DIGITALOCEAN_CLUSTER }} --kubeconfig=~/.kubeconfig
+          kubectl apply --namespace=${{ secrets.DIGITALOCEAN_CLUSTER }} -f $GITHUB_WORKSPACE/.kube/deployment.yaml --kubeconfig=~/.kubeconfig
 
       - name: Verify deployment
         run: |
-          KUBECONFIG=~/.kubeconfig
-          kubectl get namespace
-          kubectl rollout status deployment/${{ secrets.DIGITALOCEAN_CLUSTER }}
+          kubectl get namespace --kubeconfig=~/.kubeconfig
+          kubectl rollout status deployment/${{ secrets.DIGITALOCEAN_CLUSTER }} --kubeconfig=~/.kubeconfig
 
