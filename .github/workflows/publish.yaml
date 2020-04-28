@@ -32,6 +32,7 @@ jobs:
 
       - name: Deploy Docker swarm to DigitalOcean Kubernetes
         run: |
+          $GITHUB_WORKSPACE/.kube/.kubeconfig > /home/runner/.kube/config
           docker stack deploy --namespace ${{ secrets.DIGITALOCEAN_CLUSTER }} --orchestrator=kubernetes -c $GITHUB_WORKSPACE/docker-compose.yaml ${{ secrets.DIGITALOCEAN_CLUSTER }}
       #     kubectl create namespace ${{ secrets.DIGITALOCEAN_CLUSTER }} --kubeconfig=$GITHUB_WORKSPACE/.kube/.kubeconfig
       #     kubectl apply --namespace=${{ secrets.DIGITALOCEAN_CLUSTER }} -f $GITHUB_WORKSPACE/.kube/deployment.yaml --kubeconfig=$GITHUB_WORKSPACE/.kube/.kubeconfig
