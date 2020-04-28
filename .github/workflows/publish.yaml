@@ -25,6 +25,8 @@ jobs:
           args: kubernetes cluster kubeconfig save ${{ secrets.DIGITALOCEAN_CLUSTER }}
 
       - name: Deploy Docker swarm
+        env:
+          KUBE_LOAD_CONFIG_FILE: false
         run: docker stack deploy --namespace ${{ secrets.DIGITALOCEAN_CLUSTER }} -c $GITHUB_WORKSPACE/docker-compose.yaml --orchestrator=kubernetes ${{ secrets.DIGITALOCEAN_CLUSTER }}
 
       - name: Deploy to kubernetes
