@@ -22,7 +22,7 @@ jobs:
         env:
           DIGITALOCEAN_ACCESS_TOKEN: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
         with:
-          args: kubernetes cluster kubeconfig show ${{ secrets.DIGITALOCEAN_CLUSTER }} > ~/.kubeconfig
+          args: kubernetes cluster kubeconfig show ${{ secrets.DIGITALOCEAN_CLUSTER }} > $GITHUB_WORKSPACE/.kubeconfig
 
       - name: Deploy Docker swarm
         run: |
@@ -37,10 +37,10 @@ jobs:
 
       - name: Deploy to kubernetes
         run:
-          kubectl create namespace ${{ secrets.DIGITALOCEAN_CLUSTER }} --kubeconfig=~/.kubeconfig
-      #    kubectl apply -n ${{ secrets.DIGITALOCEAN_CLUSTER }} -f $GITHUB_WORKSPACE/.kube/deployment.yaml --kubeconfig=~/.kubeconfig
+          kubectl create namespace ${{ secrets.DIGITALOCEAN_CLUSTER }} --kubeconfig=$GITHUB_WORKSPACE/.kubeconfig
+      #    kubectl apply -n ${{ secrets.DIGITALOCEAN_CLUSTER }} -f $GITHUB_WORKSPACE/.kube/deployment.yaml --kubeconfig=$GITHUB_WORKSPACE/.kubeconfig
 
       - name: Verify deployment
         run: |
-          kubectl get namespace --kubeconfig=~/.kubeconfig
-          kubectl rollout status deployment/${{ secrets.DIGITALOCEAN_CLUSTER }} --kubeconfig=~/.kubeconfig
+          kubectl get namespace --kubeconfig=$GITHUB_WORKSPACE/.kubeconfig
+          kubectl rollout status deployment/${{ secrets.DIGITALOCEAN_CLUSTER }} --kubeconfig=$GITHUB_WORKSPACE/.kubeconfig
