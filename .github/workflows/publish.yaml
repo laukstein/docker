@@ -36,14 +36,11 @@ jobs:
           sed -i 's|<NAME>|/${{ secrets.DIGITALOCEAN_CLUSTER }}|g' ~/.kube/deployment.yaml
 
       - name: Deploy to kubernetes
-        uses: docker://lachlanevenson/k8s-kubectl
-        with:
-          args: |
-            create namespace ${{ secrets.DIGITALOCEAN_CLUSTER }} --kubeconfig=~/.kubeconfig
-            apply --namespace=${{ secrets.DIGITALOCEAN_CLUSTER }} -f ~/.kube/deployment.yaml --kubeconfig=~/.kubeconfig
+        run:
+          kubectl create namespace ${{ secrets.DIGITALOCEAN_CLUSTER }} --kubeconfig=~/.kubeconfig
+          kubectl apply --namespace=${{ secrets.DIGITALOCEAN_CLUSTER }} -f ~/.kube/deployment.yaml --kubeconfig=~/.kubeconfig
 
       - name: Verify deployment
-        uses: docker://lachlanevenson/k8s-kubectl
-        args: |
-          get namespace --kubeconfig=~/.kubeconfig
-          rollout status deployment/${{ secrets.DIGITALOCEAN_CLUSTER }} --kubeconfig=~/.kubeconfig
+        run: |
+          kubectl get namespace --kubeconfig=~/.kubeconfig
+          kubectl rollout status deployment/${{ secrets.DIGITALOCEAN_CLUSTER }} --kubeconfig=~/.kubeconfig
