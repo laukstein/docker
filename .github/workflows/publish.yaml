@@ -19,7 +19,7 @@ jobs:
 
       - uses: allenevans/set-env@master
         with:
-          KUBECONFIG: $GITHUB_WORKSPACE/.kube/.kubeconfig
+          KUBECONFIG: ${GITHUB_WORKSPACE}/.kube/.kubeconfig
 
       - name: Save DigitalOcean kubeconfig
         uses: digitalocean/action-doctl@master
