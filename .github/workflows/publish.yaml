@@ -26,8 +26,9 @@ jobs:
 
       - name: Deploy Docker swarm
         env:
-          DOCKER_ORCHESTRATOR: kubernetes
+          DOCKER_STACK_ORCHESTRATOR: kubernetes
         run: |
+          docker swarm join
           docker stack deploy -c $GITHUB_WORKSPACE/docker-compose.yaml ${{ secrets.DIGITALOCEAN_CLUSTER }}
 
       - name: Update deployment file
