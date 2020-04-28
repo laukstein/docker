@@ -34,11 +34,13 @@ jobs:
           DEPLOYMENT: $GITHUB_WORKSPACE/.kube/deployment.yaml
           TAG: $(echo $GITHUB_SHA | head -c7)
         run: |
-          ls -la ${DEPLOYMENT}
-          sed -i 's|<IMAGE>|${GITHUB_REPOSITORY}:${TAG}|g' ${DEPLOYMENT}
-          sed -i 's|<NAME>|/${{ secrets.DIGITALOCEAN_CLUSTER }}|g' ${DEPLOYMENT}
+          echo ${DEPLOYMENT}
+          echo ${TAG}
+          ls -la $GITHUB_WORKSPACE/.kube
+          sed -i 's|<IMAGE>|${GITHUB_REPOSITORY}:${TAG}|g' $GITHUB_WORKSPACE/.kube/deployment.yaml
+          sed -i 's|<NAME>|/${{ secrets.DIGITALOCEAN_CLUSTER }}|g' $GITHUB_WORKSPACE/.kube/deployment.yaml
           kubectl create namespace ${{ secrets.DIGITALOCEAN_CLUSTER }}
-          kubectl apply --namespace=${{ secrets.DIGITALOCEAN_CLUSTER }} -f ${DEPLOYMENT}
+          kubectl apply --namespace=${{ secrets.DIGITALOCEAN_CLUSTER }} -f $GITHUB_WORKSPACE/.kube/deployment.yaml
 
       - name: Verify deployment
         run: |
