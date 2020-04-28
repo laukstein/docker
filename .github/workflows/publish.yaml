@@ -22,7 +22,7 @@ jobs:
         env:
           DIGITALOCEAN_ACCESS_TOKEN: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
         with:
-          args: kubernetes cluster kubeconfig save ${{ secrets.DIGITALOCEAN_CLUSTER }}
+          args: kubernetes cluster kubeconfig show ${{ secrets.DIGITALOCEAN_CLUSTER }} > ~/.kube/config
 
       - name: Deploy Docker swarm
         run: |
@@ -31,7 +31,6 @@ jobs:
 
       - name: Deploy to kubernetes
         run: |
-          KUBECONFIG=$HOME/.kube/config
           TAG=$(echo $GITHUB_SHA | head -c7)
           sed -i 's|<IMAGE>|${GITHUB_REPOSITORY}:${TAG}|g' $GITHUB_WORKSPACE/.kube/deployment.yaml
           sed -i 's|<NAME>|/${{ secrets.DIGITALOCEAN_CLUSTER }}|g' $GITHUB_WORKSPACE/.kube/deployment.yaml
