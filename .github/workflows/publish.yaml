@@ -30,8 +30,6 @@ jobs:
             docker stack deploy \
             --compose-file /path/to/docker-compose.yml \
             --namespace ${{ secrets.IMAGE_NAME }} \
-            --prune \
-            --with-registry-auth \
             --kubeconfig=$GITHUB_WORKSPACE/.kubeconfig \
             --orchestrator kubernetes \
             mystack
