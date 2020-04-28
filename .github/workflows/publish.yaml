@@ -30,7 +30,7 @@ jobs:
             docker stack deploy \
             --compose-file $GITHUB_WORKSPACE/docker-compose.yaml \
             --namespace ${{ secrets.IMAGE_NAME }} \
-            --kubeconfig=$GITHUB_WORKSPACE/.kube/.kubeconfig \
+            --kubeconfig $GITHUB_WORKSPACE/.kube/.kubeconfig \
             --orchestrator kubernetes \
             mystack
 
