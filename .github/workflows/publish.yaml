@@ -19,7 +19,12 @@ jobs:
 
       - uses: allenevans/set-env@master
         with:
-          KUBECONFIG: ${GITHUB_WORKSPACE}/.kube/.kubeconfig
+          DEPLOYMENT: $GITHUB_WORKSPACE/.kube/deployment.yaml
+          KUBECONFIG: $GITHUB_WORKSPACE/.kube/.kubeconfig
+          TAG: $(echo $GITHUB_SHA | head -c7)
+
+      - name: Deploy Docker swarm
+        run: docker stack deploy --namespace ${{ secrets.DIGITALOCEAN_CLUSTER }} -c $GITHUB_WORKSPACE/docker-compose.yaml --orchestrator=kubernetes ${{ secrets.DIGITALOCEAN_CLUSTER }}
 
       - name: Save DigitalOcean kubeconfig
         uses: digitalocean/action-doctl@master
@@ -28,17 +33,12 @@ jobs:
         with:
           args: kubernetes cluster kubeconfig show ${{ secrets.DIGITALOCEAN_CLUSTER }} > ${KUBECONFIG}
 
-      # - name: Update deployment file
-      #   run: |
-      #     TAG=$(echo $GITHUB_SHA | head -c7)
-      #     sed -i 's/<IMAGE>/${GITHUB_REPOSITORY}:${TAG}/g' $GITHUB_WORKSPACE/.kube/deployment.yaml
-      #     sed -i 's/<NAME>|/${{ secrets.DIGITALOCEAN_CLUSTER }}/g' $GITHUB_WORKSPACE/.kube/deployment.yaml
-
-      - name: Deploy Docker swarm to DigitalOcean Kubernetes
+      - name: Deploy to kubernetes
         run: |
-          docker stack deploy --namespace ${{ secrets.DIGITALOCEAN_CLUSTER }} --orchestrator=kubernetes -c $GITHUB_WORKSPACE/docker-compose.yaml ${{ secrets.DIGITALOCEAN_CLUSTER }}
-      #     kubectl create namespace ${{ secrets.DIGITALOCEAN_CLUSTER }} --kubeconfig=${KUBECONFIG}
-      #     kubectl apply --namespace=${{ secrets.DIGITALOCEAN_CLUSTER }} -f $GITHUB_WORKSPACE/.kube/deployment.yaml --kubeconfig=${KUBECONFIG}
+          sed -i 's/<IMAGE>/${GITHUB_REPOSITORY}:${TAG}/g' ${DEPLOYMENT}
+          sed -i 's/<NAME>|/${{ secrets.DIGITALOCEAN_CLUSTER }}/g' ${DEPLOYMENT}
+          kubectl create namespace ${{ secrets.DIGITALOCEAN_CLUSTER }} --kubeconfig=${KUBECONFIG}
+          kubectl apply --namespace=${{ secrets.DIGITALOCEAN_CLUSTER }} -f ${DEPLOYMENT} --kubeconfig=${KUBECONFIG}
 
       # - name: Verify deployment
       #   run: |
