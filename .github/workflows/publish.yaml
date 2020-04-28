@@ -13,17 +13,18 @@ jobs:
       - uses: actions/checkout@master
 
       - name: Test docker images
-        run: docker-compose up -d --build
-
-      - name: List containers
-        run: docker ps -s -a
+        run: |
+          docker-compose up -d --build
+          docker ps -s -a
 
       - name: Save DigitalOcean kubeconfig
         uses: digitalocean/action-doctl@master
         env:
           DIGITALOCEAN_ACCESS_TOKEN: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
         with:
-          args: kubernetes cluster kubeconfig save ${{ secrets.DIGITALOCEAN_CLUSTER }}
+          args: |
+            kubernetes cluster kubeconfig show ${{ secrets.DIGITALOCEAN_CLUSTER }} > $GITHUB_WORKSPACE/.kube/.kubeconfig
+            export KUBECONFIG=$GITHUB_WORKSPACE/.kube/.kubeconfig
 
       - name: Update deployment file
         run: |
@@ -37,8 +38,7 @@ jobs:
           kubectl create namespace ${{ secrets.DIGITALOCEAN_CLUSTER }}
           kubectl apply --namespace=${{ secrets.DIGITALOCEAN_CLUSTER }} -f $GITHUB_WORKSPACE/.kube/deployment.yaml
 
-      - name: List kubernetes namespaces
-        run: kubectl get namespace
-
       - name: Verify deployment
-        run: kubectl rollout status deployment/${{ secrets.DIGITALOCEAN_CLUSTER }}
+        run: |
+          kubectl get namespace
+          kubectl rollout status deployment/${{ secrets.DIGITALOCEAN_CLUSTER }}
