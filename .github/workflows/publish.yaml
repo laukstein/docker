@@ -41,6 +41,8 @@ jobs:
 
       - name: Deploy to kubernetes
         run:
+          echo ${{ secrets.DIGITALOCEAN_CLUSTER }}
+          kubectl version --client
           kubectl apply -f $GITHUB_WORKSPACE/.kube/deployment.yaml --kubeconfig=$GITHUB_WORKSPACE/.kubeconfig
 
       - name: Verify deployment
